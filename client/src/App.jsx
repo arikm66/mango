@@ -5,10 +5,6 @@ function App() {
   const [items, setItems] = useState([]);
   const [inputValue, setInputValue] = useState('');
 
-  // Use the full URL for local testing, or relative path for production
-  // const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/items';
-
-  // No more localhost or environment variables needed here
   const API_URL = '/api/items';
 
   useEffect(() => {
