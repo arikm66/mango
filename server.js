@@ -21,16 +21,11 @@ const ItemSchema = new mongoose.Schema({
 const Item = mongoose.model('Item', ItemSchema);
 
 // 2. API Routes
-app.post('/api/items', async (req, res) => {
-  const newItem = new Item({ content: req.body.content });
-  await newItem.save();
-  res.json(newItem);
-});
+const authRoutes = require('./routes/auth');
+const itemsRoutes = require('./routes/items');
 
-app.get('/api/items', async (req, res) => {
-  const items = await Item.find();
-  res.json(items);
-});
+app.use('/api/auth', authRoutes);
+app.use('/api/items', itemsRoutes);
 
 // 3. Serve Frontend (Vite specific)
 // This part tells Node to serve the React files after you run 'npm run build' in the client folder
