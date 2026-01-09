@@ -13,14 +13,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error(err));
 
-// 1. Simple Model Schema
-const ItemSchema = new mongoose.Schema({
-  content: String,
-  date: { type: Date, default: Date.now }
-});
-const Item = mongoose.model('Item', ItemSchema);
-
-// 2. API Routes
+// API Routes
 const authRoutes = require('./routes/auth');
 const itemsRoutes = require('./routes/items');
 

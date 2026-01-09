@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -6,6 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +17,7 @@ export default function Login() {
       const user = res.data?.user;
       if (token) {
         login(token, user);
-        // optionally navigate / close modal
+        navigate('/');
       } else {
         alert(res.data?.msg || 'Login failed');
       }

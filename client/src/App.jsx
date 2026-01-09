@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import api from './services/api';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
@@ -8,15 +8,16 @@ import Register from './components/Register';
 function Home() {
   const [items, setItems] = useState([]);
   const [inputValue, setInputValue] = useState('');
-  const { token, logout } = useAuth();
+  const { token } = useAuth();
 
   useEffect(() => {
     const load = async () => {
+      if (!token) return;
       try {
         const res = await api.get('/items');
         setItems(res.data);
       } catch (err) {
-        console.error(err);
+        console.error('Error loading items:', err);
       }
     };
     load();
@@ -46,7 +47,6 @@ function Home() {
         <button onClick={saveData} style={{ padding: '8px 16px', cursor: 'pointer' }}>
           Save to DB
         </button>
-        {token && <button onClick={logout} style={{ marginLeft: 8 }}>Logout</button>}
       </div>
       <ul style={{ lineHeight: '2' }}>
         {items.map(item => <li key={item._id}>{item.content}</li>)}
@@ -55,24 +55,49 @@ function Home() {
   );
 }
 
+function Navigation() {
+  const { token, logout } = useAuth();
+
+  return (
+    <nav style={{ marginBottom: 12 }}>
+      <Link to="/" style={{ marginRight: 8 }}>Home</Link>
+      {!token && (
+        <>
+          <Link to="/login" style={{ marginRight: 8 }}>Login</Link>
+          <Link to="/register">Register</Link>
+        </>
+      )}
+      {token && (
+        <a onClick={logout} style={{ marginRight: 8, cursor: 'pointer' }}>
+          Logout
+        </a>
+      )}
+    </nav>
+  );
+}
+
 function AppWrapper() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div style={{ padding: 12 }}>
-          <nav style={{ marginBottom: 12 }}>
-            <Link to="/" style={{ marginRight: 8 }}>Home</Link>
-            <Link to="/login" style={{ marginRight: 8 }}>Login</Link>
-            <Link to="/register">Register</Link>
-          </nav>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </div>
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
+  );
+}
+
+function AppRoutes() {
+  const { token } = useAuth();
+
+  return (
+    <div style={{ padding: 12 }}>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={token ? <Home /> : <Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </div>
   );
 }
 
