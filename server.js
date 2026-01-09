@@ -4,6 +4,9 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -32,5 +35,16 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:5173',
+    methods: ['GET', 'POST']
+  }
+});
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Socket.io game logic
+require('./sockets/gameSocket')(io);
+
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

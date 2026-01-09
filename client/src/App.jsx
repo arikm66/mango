@@ -4,6 +4,8 @@ import api from './services/api';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
 import Register from './components/Register';
+import Lobby from './components/Lobby';
+import GameRoom from './components/GameRoom';
 
 function Home() {
   const [items, setItems] = useState([]);
@@ -56,7 +58,7 @@ function Home() {
 }
 
 function Navigation() {
-  const { token, logout } = useAuth();
+  const { token, user, logout } = useAuth();
 
   return (
     <nav style={{ marginBottom: 12 }}>
@@ -68,9 +70,15 @@ function Navigation() {
         </>
       )}
       {token && (
-        <a onClick={logout} style={{ marginRight: 8, cursor: 'pointer' }}>
-          Logout
-        </a>
+        <>
+          <Link to="/lobby" style={{ marginRight: 8 }}>Lobby</Link>
+          <span style={{ marginRight: 12, color: '#555' }}>
+            {user?.email || 'Signed in'}
+          </span>
+          <a onClick={logout} style={{ marginRight: 8, cursor: 'pointer' }}>
+            Logout
+          </a>
+        </>
       )}
     </nav>
   );
@@ -93,7 +101,10 @@ function AppRoutes() {
     <div style={{ padding: 12 }}>
       <Navigation />
       <Routes>
-        <Route path="/" element={token ? <Home /> : <Navigate to="/login" replace />} />
+        <Route path="/" element={token ? <Lobby /> : <Navigate to="/login" replace />} />
+        <Route path="/lobby" element={token ? <Lobby /> : <Navigate to="/login" replace />} />
+        <Route path="/game/:roomCode" element={token ? <GameRoom /> : <Navigate to="/login" replace />} />
+        <Route path="/items" element={token ? <Home /> : <Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

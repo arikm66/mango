@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // POST /api/auth/register
 router.post('/register',
@@ -51,5 +52,16 @@ router.post('/login',
       res.status(500).json({ msg: 'Server error' });
     }
   });
+
+// GET /api/auth/me
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('id email');
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+    res.json({ user: { id: user.id, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
 
 module.exports = router;

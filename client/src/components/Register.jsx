@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +17,7 @@ export default function Register() {
       const user = res.data?.user;
       if (token) {
         login(token, user);
-        // optionally navigate
+        navigate('/');
       } else {
         alert(res.data?.msg || 'Registration failed');
       }
